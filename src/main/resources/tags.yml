@@ -1,0 +1,85 @@
+# ============================================================
+#                     TAG DEFINITIONS
+# ============================================================
+#
+# Each tag entry uses the tag ID as the key.
+#
+# Fields:
+#   display          - MiniMessage prefix string (do NOT include a trailing space)
+#   category         - Category key from config.yml (e.g. store, vote, misc)
+#   unlock-type      - permission | granted
+#   unlock-permission - Permission node (only for permission type, default: tags.<id>)
+#   material         - GUI item material (default: NAME_TAG)
+#   hidden           - Hide from GUI when locked (default: false)
+#   lore             - List of MiniMessage lore lines for the GUI
+#                      Use <count> for the number of players who claimed this tag
+#   voucher          - Per-tag voucher customization (optional, falls back to
+#                      global voucher defaults in config.yml)
+#     material       - Voucher item material
+#     name           - Voucher display name (supports <tag> placeholder)
+#     lore           - Voucher lore lines (supports <tag> placeholder)
+#     glow           - Whether the voucher item glows
+#
+# ============================================================
+
+
+# ============================================================
+# EXAMPLE TAGS
+# ============================================================
+# Below are example tags demonstrating the different features.
+# Replace these with your own tags.
+
+# Permission-based tag: unlocked automatically when the player
+# has the specified permission (e.g. from a rank plugin).
+vip:
+  display: '<#FFD700>[ᴠɪᴘ]'
+  category: general
+  unlock-type: permission
+  unlock-permission: group.vip
+  material: GOLD_INGOT
+  lore:
+    - '<#6C757D>Available to VIP rank holders.'
+    - '<#6C757D>Tags claimed: <#FCD472><count>'
+
+# Grant-based tag: given to players via commands or vouchers.
+# Demonstrates per-tag voucher customization.
+explorer:
+  display: '<#87CEEB>[ᴇxᴘʟᴏʀᴇʀ]'
+  category: general
+  unlock-type: granted
+  material: COMPASS
+  lore:
+    - '<#6C757D>Awarded for exploring the world.'
+    - '<#6C757D>Tags claimed: <#FCD472><count>'
+  voucher:
+    material: COMPASS
+    name: '<#87CEEB>[ᴇxᴘʟᴏʀᴇʀ] <#f2ebd7>Chat Tag'
+    lore:
+      - '<#6C757D>ᴄᴏꜱᴍᴇᴛɪᴄ ᴛᴀɢ ᴛʜᴀᴛ ꜱʜᴏᴡꜱ ɪɴ ᴄʜᴀᴛ'
+      - ''
+      - '<#f2ebd7>ᴛʜɪꜱ ɪꜱ ᴀ ᴘʜʏꜱɪᴄᴀʟ ᴠᴏᴜᴄʜᴇʀ ᴛʜᴀᴛ'
+      - '<#f2ebd7>ɢɪᴠᴇꜱ ᴛʜᴇ <#87CEEB>[ᴇxᴘʟᴏʀᴇʀ] <#f2ebd7>ᴛᴀɢ ᴡʜᴇɴ ᴜꜱᴇᴅ.'
+      - ''
+      - '<#FCD472>[ʀɪɢʜᴛ-ᴄʟɪᴄᴋ ᴛᴏ ʀᴇᴅᴇᴇᴍ]'
+    glow: true
+
+# Seasonal tag using global voucher defaults.
+snowfall:
+  display: '<#B0E0E6>[ꜱɴᴏᴡꜰᴀʟʟ]'
+  category: seasonal
+  unlock-type: granted
+  material: SNOWBALL
+  lore:
+    - '<#6C757D>A winter holiday exclusive.'
+    - '<#6C757D>Tags claimed: <#FCD472><count>'
+
+# Hidden tag: only visible in the GUI once unlocked.
+legendary:
+  display: '<#FF4500>[ʟᴇɢᴇɴᴅᴀʀʏ]'
+  category: special
+  unlock-type: granted
+  material: NETHER_STAR
+  hidden: true
+  lore:
+    - '<#6C757D>A rare and elusive tag.'
+    - '<#6C757D>Tags claimed: <#FCD472><count>'

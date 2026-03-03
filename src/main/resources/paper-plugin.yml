@@ -1,0 +1,58 @@
+name: OakTags
+version: '${version}'
+main: dev.oakheart.oaktags.OakTags
+description: 'Unified chat tag system with GUI, vouchers, and PlaceholderAPI integration.'
+api-version: '1.21.8'
+authors:
+  - Loralon
+website: https://github.com/LoralonMC/OakTags
+dependencies:
+  server:
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+permissions:
+  oaktags.*:
+    description: 'All OakTags permissions'
+    default: op
+    children:
+      oaktags.use: true
+      oaktags.reload: true
+      oaktags.give: true
+      oaktags.revoke: true
+      oaktags.create: true
+      oaktags.delete: true
+      oaktags.voucher: true
+      oaktags.list: true
+      oaktags.admin: true
+      oaktags.stack: true
+  oaktags.use:
+    description: 'Open the tags GUI and equip tags'
+    default: true
+  oaktags.reload:
+    description: 'Reload plugin configuration'
+    default: op
+  oaktags.give:
+    description: 'Grant tags to players'
+    default: op
+  oaktags.revoke:
+    description: 'Revoke tags from players'
+    default: op
+  oaktags.create:
+    description: 'Create, edit, and delete tags'
+    default: op
+  oaktags.delete:
+    description: 'Delete tags'
+    default: op
+  oaktags.voucher:
+    description: 'Give tag voucher items'
+    default: op
+  oaktags.list:
+    description: 'List unlocked tags for any player'
+    default: op
+  oaktags.admin:
+    description: 'Open admin tag management GUI for any player'
+    default: op
+  oaktags.stack:
+    description: 'Show both rank prefix and tag in %oaktags_prefix%'
+    default: op
