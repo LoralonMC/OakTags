@@ -243,7 +243,7 @@ public class TagsGUI implements InventoryHolder {
         if (lore != null && !lore.isEmpty()) {
             List<Component> loreComponents = new ArrayList<>();
             for (String line : lore) {
-                if (!line.isEmpty()) loreComponents.add(messages.deserialize(line, resolvers));
+                loreComponents.add(line.isEmpty() ? Component.empty() : messages.deserialize(line, resolvers));
             }
             if (!loreComponents.isEmpty()) meta.lore(loreComponents);
         }

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `/tags give` and `/tags revoke` now support offline players
 
+### Fixed
+
+- Empty lore lines in GUI button configs now render as blank spacers instead of being skipped
+
 ## [1.0.0] - 2026-03-03
 
 ### Added

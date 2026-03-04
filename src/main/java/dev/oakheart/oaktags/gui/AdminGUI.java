@@ -302,7 +302,7 @@ public class AdminGUI implements InventoryHolder {
         if (itemConfig.lore() != null && !itemConfig.lore().isEmpty()) {
             List<Component> loreComponents = new ArrayList<>();
             for (String line : itemConfig.lore()) {
-                if (!line.isEmpty()) loreComponents.add(messages.deserialize(line, resolvers));
+                loreComponents.add(line.isEmpty() ? Component.empty() : messages.deserialize(line, resolvers));
             }
             if (!loreComponents.isEmpty()) meta.lore(loreComponents);
         }
