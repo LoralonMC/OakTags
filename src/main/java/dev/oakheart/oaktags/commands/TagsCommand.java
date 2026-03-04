@@ -302,12 +302,6 @@ public class TagsCommand {
     }
 
     private void handleGive(CommandSender sender, String playerName, String tagId) {
-        Player target = Bukkit.getPlayer(playerName);
-        if (target == null) {
-            messages.sendCommand(sender, "player-not-found");
-            return;
-        }
-
         TagDefinition tag = tagManager.getTag(tagId);
         if (tag == null) {
             messages.sendCommand(sender, "tag-not-found",
@@ -320,29 +314,64 @@ public class TagsCommand {
             return;
         }
 
-        if (tagManager.hasTag(target, tagId)) {
-            messages.sendCommand(sender, "player-already-has-tag",
-                    Placeholder.unparsed("player", target.getName()));
+        Player onlineTarget = Bukkit.getPlayerExact(playerName);
+        if (onlineTarget != null) {
+            executeGive(sender, onlineTarget.getName(), onlineTarget.getUniqueId(), tag, onlineTarget);
             return;
         }
 
-        tagManager.grantTag(target.getUniqueId(), tagId, sender.getName());
+        OfflinePlayer offlineTarget = Bukkit.getOfflinePlayerIfCached(playerName);
+        if (offlineTarget == null) {
+            messages.sendCommand(sender, "player-not-found");
+            return;
+        }
+
+        UUID targetUuid = offlineTarget.getUniqueId();
+        String targetName = offlineTarget.getName() != null ? offlineTarget.getName() : playerName;
+
+        if (tagManager.getPlayerData(targetUuid) != null) {
+            executeGive(sender, targetName, targetUuid, tag, null);
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            tagManager.loadPlayer(targetUuid);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (tagManager.getPlayerData(targetUuid) == null) {
+                    messages.sendCommand(sender, "player-not-found");
+                    return;
+                }
+                executeGive(sender, targetName, targetUuid, tag, null);
+                if (Bukkit.getPlayer(targetUuid) == null
+                        && AdminGUI.countViewers(targetUuid) == 0) {
+                    tagManager.evictPlayer(targetUuid);
+                }
+            });
+        });
+    }
+
+    private void executeGive(CommandSender sender, String targetName, UUID targetUuid,
+                             TagDefinition tag, Player onlineTarget) {
+        PlayerTagData data = tagManager.getPlayerData(targetUuid);
+        if (data != null && data.hasGrantedTag(tag.getId())) {
+            messages.sendCommand(sender, "player-already-has-tag",
+                    Placeholder.unparsed("player", targetName));
+            return;
+        }
+
+        tagManager.grantTag(targetUuid, tag.getId(), sender.getName());
 
         messages.sendCommand(sender, "tag-given",
                 Placeholder.parsed("tag", tag.getDisplay()),
-                Placeholder.unparsed("player", target.getName()));
+                Placeholder.unparsed("player", targetName));
 
-        messages.sendCommand(target, "tag-received",
-                Placeholder.parsed("tag", tag.getDisplay()));
+        if (onlineTarget != null) {
+            messages.sendCommand(onlineTarget, "tag-received",
+                    Placeholder.parsed("tag", tag.getDisplay()));
+        }
     }
 
     private void handleRevoke(CommandSender sender, String playerName, String tagId) {
-        Player target = Bukkit.getPlayer(playerName);
-        if (target == null) {
-            messages.sendCommand(sender, "player-not-found");
-            return;
-        }
-
         TagDefinition tag = tagManager.getTag(tagId);
         if (tag == null) {
             messages.sendCommand(sender, "tag-not-found",
@@ -355,20 +384,61 @@ public class TagsCommand {
             return;
         }
 
-        if (!tagManager.hasTag(target, tagId)) {
-            messages.sendCommand(sender, "player-doesnt-have-tag",
-                    Placeholder.unparsed("player", target.getName()));
+        Player onlineTarget = Bukkit.getPlayerExact(playerName);
+        if (onlineTarget != null) {
+            executeRevoke(sender, onlineTarget.getName(), onlineTarget.getUniqueId(), tag, onlineTarget);
             return;
         }
 
-        tagManager.revokeTag(target.getUniqueId(), tagId);
+        OfflinePlayer offlineTarget = Bukkit.getOfflinePlayerIfCached(playerName);
+        if (offlineTarget == null) {
+            messages.sendCommand(sender, "player-not-found");
+            return;
+        }
+
+        UUID targetUuid = offlineTarget.getUniqueId();
+        String targetName = offlineTarget.getName() != null ? offlineTarget.getName() : playerName;
+
+        if (tagManager.getPlayerData(targetUuid) != null) {
+            executeRevoke(sender, targetName, targetUuid, tag, null);
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            tagManager.loadPlayer(targetUuid);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (tagManager.getPlayerData(targetUuid) == null) {
+                    messages.sendCommand(sender, "player-not-found");
+                    return;
+                }
+                executeRevoke(sender, targetName, targetUuid, tag, null);
+                if (Bukkit.getPlayer(targetUuid) == null
+                        && AdminGUI.countViewers(targetUuid) == 0) {
+                    tagManager.evictPlayer(targetUuid);
+                }
+            });
+        });
+    }
+
+    private void executeRevoke(CommandSender sender, String targetName, UUID targetUuid,
+                               TagDefinition tag, Player onlineTarget) {
+        PlayerTagData data = tagManager.getPlayerData(targetUuid);
+        if (data == null || !data.hasGrantedTag(tag.getId())) {
+            messages.sendCommand(sender, "player-doesnt-have-tag",
+                    Placeholder.unparsed("player", targetName));
+            return;
+        }
+
+        tagManager.revokeTag(targetUuid, tag.getId());
 
         messages.sendCommand(sender, "tag-revoked",
                 Placeholder.parsed("tag", tag.getDisplay()),
-                Placeholder.unparsed("player", target.getName()));
+                Placeholder.unparsed("player", targetName));
 
-        messages.sendCommand(target, "tag-revoked-notify",
-                Placeholder.parsed("tag", tag.getDisplay()));
+        if (onlineTarget != null) {
+            messages.sendCommand(onlineTarget, "tag-revoked-notify",
+                    Placeholder.parsed("tag", tag.getDisplay()));
+        }
     }
 
     private void handleCreate(Player player, String id) {
