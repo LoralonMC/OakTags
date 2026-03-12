@@ -1,5 +1,6 @@
 package dev.oakheart.oaktags;
 
+import dev.oakheart.oaktags.api.OakTagsAPI;
 import dev.oakheart.oaktags.commands.TagsCommand;
 import dev.oakheart.oaktags.config.ConfigManager;
 import dev.oakheart.oaktags.data.DataStore;
@@ -48,6 +49,7 @@ public final class OakTags extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        OakTagsAPI.unregister();
         TagEditorGUI.closeAll();
         AdminGUI.closeAll();
         TagsGUI.closeAll();
@@ -72,6 +74,8 @@ public final class OakTags extends JavaPlugin {
 
         tagManager = new TagManager(this, configManager, dataStore);
         tagManager.initialize();
+
+        new OakTagsAPI(tagManager);
 
         tagsYamlWriter = new TagsYamlWriter(configManager.getTagsFile(), getLogger());
     }
