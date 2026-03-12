@@ -196,6 +196,29 @@ public class TagManager {
         return playerCache.get(uuid);
     }
 
+    /**
+     * Get player data from cache, or load from database without caching.
+     * Used by the API to serve data for offline players.
+     */
+    public PlayerTagData getOrLoadPlayerData(UUID uuid) {
+        PlayerTagData cached = playerCache.get(uuid);
+        if (cached != null) return cached;
+
+        // Load from database without caching
+        Set<String> grantedTags = dataStore.loadPlayerTags(uuid);
+        DataStore.PlayerSettings settings = dataStore.loadPlayerSettings(uuid);
+
+        PlayerTagData data = new PlayerTagData();
+        data.getGrantedTagIds().addAll(grantedTags);
+        data.setActiveTagId(settings.activeTag());
+        data.setSortMode(settings.sortMode());
+        data.setSortReversed(settings.sortReversed());
+        data.setFilterMode(settings.filterMode());
+        data.getFavoriteTagIds().addAll(settings.favorites());
+
+        return data;
+    }
+
     public void markDirty(UUID uuid) {
         dirtySettings.add(uuid);
     }

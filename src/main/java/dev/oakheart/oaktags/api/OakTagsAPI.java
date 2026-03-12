@@ -61,14 +61,14 @@ public class OakTagsAPI {
     /**
      * Get the set of granted tag IDs for a player.
      * Only includes tags with unlock type GRANTED — does not include permission-based tags.
-     * The player must be online or have been loaded into the cache.
+     * Works for both online and offline players.
      *
      * @param uuid the player's UUID
      * @return an unmodifiable set of granted tag IDs, or an empty set if not found
      */
     @NotNull
     public Set<String> getGrantedTags(@NotNull UUID uuid) {
-        PlayerTagData data = tagManager.getPlayerData(uuid);
+        PlayerTagData data = tagManager.getOrLoadPlayerData(uuid);
         if (data == null) return Set.of();
         return Collections.unmodifiableSet(new HashSet<>(data.getGrantedTagIds()));
     }
@@ -113,7 +113,7 @@ public class OakTagsAPI {
         }
 
         // Offline: only check granted
-        PlayerTagData data = tagManager.getPlayerData(uuid);
+        PlayerTagData data = tagManager.getOrLoadPlayerData(uuid);
         return data != null && data.hasGrantedTag(tagId);
     }
 
@@ -125,7 +125,8 @@ public class OakTagsAPI {
      */
     @Nullable
     public String getActiveTagId(@NotNull UUID uuid) {
-        return tagManager.getActiveTagId(uuid);
+        PlayerTagData data = tagManager.getOrLoadPlayerData(uuid);
+        return data != null ? data.getActiveTagId() : null;
     }
 
     /**
@@ -136,7 +137,10 @@ public class OakTagsAPI {
      */
     @NotNull
     public String getActiveTagDisplay(@NotNull UUID uuid) {
-        return tagManager.getActiveTagDisplay(uuid);
+        PlayerTagData data = tagManager.getOrLoadPlayerData(uuid);
+        if (data == null || data.getActiveTagId() == null) return "";
+        TagInfo tag = getTag(data.getActiveTagId());
+        return tag != null ? tag.display() : "";
     }
 
     // ── Tag Definition Queries ───────────────────────────────────────────
