@@ -1,6 +1,7 @@
 package dev.oakheart.oaktags.managers;
 
 import dev.oakheart.oaktags.OakTags;
+import dev.oakheart.oaktags.api.TagChangeEvent;
 import dev.oakheart.oaktags.config.ConfigManager;
 import dev.oakheart.oaktags.data.DataStore;
 import dev.oakheart.oaktags.model.*;
@@ -140,6 +141,7 @@ public class TagManager {
 
         unlockedCountCache.remove(uuid);
         claimCounts.merge(tagId, 1, Integer::sum);
+        Bukkit.getPluginManager().callEvent(new TagChangeEvent(uuid, TagChangeEvent.Action.GRANT, tagId));
         return true;
     }
 
@@ -166,6 +168,7 @@ public class TagManager {
 
         unlockedCountCache.remove(uuid);
         claimCounts.computeIfPresent(tagId, (k, v) -> Math.max(0, v - 1));
+        Bukkit.getPluginManager().callEvent(new TagChangeEvent(uuid, TagChangeEvent.Action.REVOKE, tagId));
         return true;
     }
 
@@ -174,6 +177,8 @@ public class TagManager {
         if (data == null) return;
         data.setActiveTagId(tagId);
         dirtySettings.add(uuid);
+        TagChangeEvent.Action action = tagId != null ? TagChangeEvent.Action.EQUIP : TagChangeEvent.Action.UNEQUIP;
+        Bukkit.getPluginManager().callEvent(new TagChangeEvent(uuid, action, tagId));
     }
 
     public void clearActiveTag(UUID uuid) {
