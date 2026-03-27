@@ -308,7 +308,7 @@ messages:
     help-create: "<#6C757D>  /tags create <id> <#f2ebd7>- Create a tag (opens editor)"
     help-edit: "<#6C757D>  /tags edit <id> <#f2ebd7>- Edit a tag (opens editor)"
     help-delete: "<#6C757D>  /tags delete <id> <#f2ebd7>- Delete a tag"
-    help-voucher: "<#6C757D>  /tags voucher <tag> [player] [amount] <#f2ebd7>- Give vouchers"
+    help-voucher: "<#6C757D>  /tags voucher <tag> [player] [amount] [silent] <#f2ebd7>- Give vouchers"
     help-list: "<#6C757D>  /tags list [player] <#f2ebd7>- List unlocked tags"
     help-admin: "<#6C757D>  /tags <player> <#f2ebd7>- Admin tag management"
     admin-permission-managed: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#D89B6A>This tag is managed by permissions."

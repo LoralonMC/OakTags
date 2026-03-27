@@ -184,7 +184,7 @@ public class TagsCommand {
                                 .executes(ctx -> {
                                     handleVoucher(ctx.getSource().getSender(),
                                             StringArgumentType.getString(ctx, "tag"),
-                                            null, 1);
+                                            null, 1, false);
                                     return Command.SINGLE_SUCCESS;
                                 })
                                 .then(Commands.argument("player", StringArgumentType.word())
@@ -192,17 +192,32 @@ public class TagsCommand {
                                         .executes(ctx -> {
                                             handleVoucher(ctx.getSource().getSender(),
                                                     StringArgumentType.getString(ctx, "tag"),
-                                                    StringArgumentType.getString(ctx, "player"), 1);
+                                                    StringArgumentType.getString(ctx, "player"), 1, false);
                                             return Command.SINGLE_SUCCESS;
                                         })
+                                        .then(Commands.literal("silent")
+                                                .executes(ctx -> {
+                                                    handleVoucher(ctx.getSource().getSender(),
+                                                            StringArgumentType.getString(ctx, "tag"),
+                                                            StringArgumentType.getString(ctx, "player"), 1, true);
+                                                    return Command.SINGLE_SUCCESS;
+                                                }))
                                         .then(Commands.argument("amount", IntegerArgumentType.integer(1, 64))
                                                 .executes(ctx -> {
                                                     handleVoucher(ctx.getSource().getSender(),
                                                             StringArgumentType.getString(ctx, "tag"),
                                                             StringArgumentType.getString(ctx, "player"),
-                                                            IntegerArgumentType.getInteger(ctx, "amount"));
+                                                            IntegerArgumentType.getInteger(ctx, "amount"), false);
                                                     return Command.SINGLE_SUCCESS;
-                                                })))))
+                                                })
+                                                .then(Commands.literal("silent")
+                                                        .executes(ctx -> {
+                                                            handleVoucher(ctx.getSource().getSender(),
+                                                                    StringArgumentType.getString(ctx, "tag"),
+                                                                    StringArgumentType.getString(ctx, "player"),
+                                                                    IntegerArgumentType.getInteger(ctx, "amount"), true);
+                                                            return Command.SINGLE_SUCCESS;
+                                                        }))))))
                 .then(Commands.literal("list")
                         .requires(src -> src.getSender().hasPermission("oaktags.list"))
                         .executes(ctx -> {
@@ -491,7 +506,7 @@ public class TagsCommand {
         }
     }
 
-    private void handleVoucher(CommandSender sender, String tagId, String playerName, int amount) {
+    private void handleVoucher(CommandSender sender, String tagId, String playerName, int amount, boolean silent) {
         TagDefinition tag = tagManager.getTag(tagId);
         if (tag == null) {
             messages.sendCommand(sender, "tag-not-found",
@@ -524,7 +539,7 @@ public class TagsCommand {
                 Placeholder.unparsed("player", target.getName()),
                 Placeholder.unparsed("amount", String.valueOf(amount)));
 
-        if (!target.equals(sender)) {
+        if (!silent && !target.equals(sender)) {
             messages.sendCommand(target, "voucher-received",
                     Placeholder.parsed("tag", tag.getDisplay()),
                     Placeholder.unparsed("amount", String.valueOf(amount)));
