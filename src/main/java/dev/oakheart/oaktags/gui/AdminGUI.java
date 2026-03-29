@@ -3,6 +3,7 @@ package dev.oakheart.oaktags.gui;
 import dev.oakheart.oaktags.OakTags;
 import dev.oakheart.oaktags.config.ConfigManager;
 import dev.oakheart.oaktags.config.ConfigManager.GuiItemConfig;
+import dev.oakheart.oaktags.integration.ModelProviderManager;
 import dev.oakheart.oaktags.managers.TagManager;
 import dev.oakheart.oaktags.message.MessageManager;
 import dev.oakheart.oaktags.model.PlayerTagData;
@@ -144,6 +145,12 @@ public class AdminGUI implements InventoryHolder {
 
         Material material = unlocked ? tag.getMaterial() : config.getLockedTagMaterial();
         ItemStack item = new ItemStack(material);
+
+        // Apply custom icon model for unlocked tags
+        if (unlocked && tag.getModelId() != null && !tag.getModelId().isEmpty()) {
+            new ModelProviderManager(plugin.getLogger()).applyModelById(item, tag.getModelId());
+        }
+
         ItemMeta meta = item.getItemMeta();
         meta.displayName(messages.deserialize(config.getTagDisplayFormat(),
                 Placeholder.parsed("tag", tag.getDisplay()),

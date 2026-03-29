@@ -19,6 +19,7 @@ import java.util.List;
  * @param hidden           whether the tag is hidden when locked
  * @param lore             the tag's lore lines (MiniMessage format)
  * @param material         the GUI material for this tag
+ * @param modelId          the custom model ID for the GUI icon (nullable)
  */
 public record TagInfo(
         @NotNull String id,
@@ -28,7 +29,8 @@ public record TagInfo(
         @Nullable String unlockPermission,
         boolean hidden,
         @NotNull List<String> lore,
-        @NotNull Material material
+        @NotNull Material material,
+        @Nullable String modelId
 ) {
     static TagInfo fromDefinition(TagDefinition def) {
         return new TagInfo(
@@ -39,7 +41,8 @@ public record TagInfo(
                 def.getUnlockPermission(),
                 def.isHidden(),
                 List.copyOf(def.getLore()),
-                def.getMaterial()
+                def.getMaterial(),
+                def.getModelId()
         );
     }
 }

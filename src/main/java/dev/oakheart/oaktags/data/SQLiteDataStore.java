@@ -234,6 +234,8 @@ public class SQLiteDataStore implements DataStore {
 
     @Override
     public synchronized void close() {
+        operational = false;
+
         closeStatement(loadPlayerTagsStmt);
         closeStatement(grantTagStmt);
         closeStatement(revokeTagStmt);
@@ -248,7 +250,6 @@ public class SQLiteDataStore implements DataStore {
                 logger.log(Level.WARNING, "Failed to close database connection", e);
             }
         }
-        operational = false;
     }
 
     private void closeStatement(PreparedStatement stmt) {

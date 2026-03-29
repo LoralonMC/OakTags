@@ -10,6 +10,11 @@
 #   unlock-type      - permission | granted
 #   unlock-permission - Permission node (only for permission type, default: tags.<id>)
 #   material         - GUI item material (default: NAME_TAG)
+#   model-id         - Custom model for the GUI icon (optional). Formats:
+#                        nexo:<id>          - Nexo item model
+#                        itemsadder:<id>    - ItemsAdder item model
+#                        model:<ns:key>     - Modern Item Model (1.21.4+)
+#                        <integer>          - Vanilla CustomModelData
 #   hidden           - Hide from GUI when locked (default: false)
 #   lore             - List of MiniMessage lore lines for the GUI
 #                      Use <count> for the number of players who claimed this tag

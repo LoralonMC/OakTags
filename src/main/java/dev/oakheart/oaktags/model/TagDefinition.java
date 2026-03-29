@@ -14,12 +14,14 @@ public class TagDefinition {
     private boolean hidden;
     private List<String> lore;
     private Material material;
+    private String modelId;
     private int sortOrder;
     private VoucherConfig voucherConfig;
 
     public TagDefinition(String id, String display, String category, UnlockType unlockType,
                          String unlockPermission, boolean hidden, List<String> lore,
-                         Material material, int sortOrder, VoucherConfig voucherConfig) {
+                         Material material, String modelId, int sortOrder,
+                         VoucherConfig voucherConfig) {
         this.id = id;
         this.display = display;
         this.category = category;
@@ -28,6 +30,7 @@ public class TagDefinition {
         this.hidden = hidden;
         this.lore = lore;
         this.material = material;
+        this.modelId = modelId;
         this.sortOrder = sortOrder;
         this.voucherConfig = voucherConfig;
     }
@@ -92,6 +95,14 @@ public class TagDefinition {
         this.material = material;
     }
 
+    public String getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
+    }
+
     public int getSortOrder() {
         return sortOrder;
     }
@@ -107,7 +118,7 @@ public class TagDefinition {
     public TagDefinition copy() {
         return new TagDefinition(
                 id, display, category, unlockType, unlockPermission,
-                hidden, new ArrayList<>(lore), material, sortOrder,
+                hidden, new ArrayList<>(lore), material, modelId, sortOrder,
                 voucherConfig != null ? voucherConfig.copy() : null
         );
     }

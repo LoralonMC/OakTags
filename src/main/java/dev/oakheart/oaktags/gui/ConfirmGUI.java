@@ -31,6 +31,7 @@ public class ConfirmGUI implements InventoryHolder {
     private final Player player;
     private final String tagId;
     private Inventory inventory;
+    private boolean consumed = false;
 
     public ConfirmGUI(OakTags plugin, Player player, String tagId) {
         this.plugin = plugin;
@@ -120,6 +121,9 @@ public class ConfirmGUI implements InventoryHolder {
     }
 
     private void handleConfirm() {
+        if (consumed) return;
+        consumed = true;
+
         TagManager tagManager = plugin.getTagManager();
         MessageManager messages = plugin.getMessageManager();
 
@@ -164,7 +168,7 @@ public class ConfirmGUI implements InventoryHolder {
     }
 
     private ItemStack findVoucherInHands() {
-        NamespacedKey key = new NamespacedKey(plugin, "tag_voucher_id");
+        NamespacedKey key = new NamespacedKey(plugin, OakTags.VOUCHER_KEY_ID);
         ItemStack mainHand = player.getInventory().getItemInMainHand();
         if (isVoucherForTag(mainHand, key)) return mainHand;
         ItemStack offHand = player.getInventory().getItemInOffHand();

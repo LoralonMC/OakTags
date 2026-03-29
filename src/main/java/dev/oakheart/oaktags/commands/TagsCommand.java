@@ -472,7 +472,7 @@ public class TagsCommand {
         String display = config.getDefaultTagDisplay().replace("<id>", id);
         TagDefinition tag = new TagDefinition(id, display,
                 config.getDefaultTagCategory(), UnlockType.GRANTED, null, false,
-                new ArrayList<>(config.getDefaultTagLore()), config.getDefaultTagMaterial(), 10000, null);
+                new ArrayList<>(config.getDefaultTagLore()), config.getDefaultTagMaterial(), null, 10000, null);
 
         new TagEditorGUI(plugin, player, tag, true).open();
     }
@@ -570,7 +570,7 @@ public class TagsCommand {
             meta.setEnchantmentGlintOverride(true);
         }
 
-        NamespacedKey key = new NamespacedKey(plugin, "tag_voucher_id");
+        NamespacedKey key = new NamespacedKey(plugin, OakTags.VOUCHER_KEY_ID);
         meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, tag.getId());
 
         item.setItemMeta(meta);

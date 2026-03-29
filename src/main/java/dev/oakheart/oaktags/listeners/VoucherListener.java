@@ -25,7 +25,7 @@ public class VoucherListener implements Listener {
         this.plugin = plugin;
         this.tagManager = tagManager;
         this.messages = messages;
-        this.voucherKey = new NamespacedKey(plugin, "tag_voucher_id");
+        this.voucherKey = new NamespacedKey(plugin, OakTags.VOUCHER_KEY_ID);
     }
 
     @EventHandler(ignoreCancelled = true)

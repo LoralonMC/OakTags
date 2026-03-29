@@ -24,6 +24,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Level;
 
 public final class OakTags extends JavaPlugin {
+    public static final String VOUCHER_KEY_ID = "tag_voucher_id";
+
     private ConfigManager configManager;
     private MessageManager messageManager;
     private DataStore dataStore;
@@ -105,6 +107,13 @@ public final class OakTags extends JavaPlugin {
             getLogger().info("PlaceholderAPI integration enabled.");
         } else {
             getLogger().info("PlaceholderAPI not found. Placeholders will not be available.");
+        }
+
+        if (Bukkit.getPluginManager().getPlugin("Nexo") != null) {
+            getLogger().info("Nexo detected. Nexo model provider available for tag icons.");
+        }
+        if (Bukkit.getPluginManager().getPlugin("ItemsAdder") != null) {
+            getLogger().info("ItemsAdder detected. ItemsAdder model provider available for tag icons.");
         }
     }
 

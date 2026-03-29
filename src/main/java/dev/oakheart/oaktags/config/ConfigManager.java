@@ -129,6 +129,11 @@ public class ConfigManager {
     private LinkedHashMap<String, TagDefinition> tagDefinitions;
     private LinkedHashMap<String, CategoryConfig> categories;
 
+    // Cached derived values
+    private List<String> categoryKeysList;
+    private Map<String, String> categoryDisplayNamesMap;
+    private VoucherConfig defaultVoucherConfigObj;
+
     public ConfigManager(OakTags plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
@@ -382,6 +387,14 @@ public class ConfigManager {
             catList.sort(Comparator.comparingInt(e -> e.getValue().sortOrder()));
             catList.forEach(e -> categories.put(e.getKey(), e.getValue()));
         }
+
+        // Cache derived values
+        categoryKeysList = new ArrayList<>(categories.keySet());
+        Map<String, String> names = new LinkedHashMap<>();
+        categories.forEach((k, v) -> names.put(k, v.displayName()));
+        categoryDisplayNamesMap = names;
+        defaultVoucherConfigObj = new VoucherConfig(defaultVoucherMaterial, defaultVoucherName,
+                defaultVoucherLore, defaultVoucherGlow);
     }
 
     private GuiItemConfig parseGuiItem(String path, Material defaultMaterial,
@@ -435,9 +448,11 @@ public class ConfigManager {
                 voucherConfig = new VoucherConfig(vMaterial, vName, vLore, vGlow);
             }
 
+            String modelId = section.getString("model-id", null);
+
             tagDefinitions.put(id, new TagDefinition(
                     id, display, category, unlockType, unlockPermission,
-                    hidden, lore, material, order++, voucherConfig
+                    hidden, lore, material, modelId, order++, voucherConfig
             ));
         }
 
@@ -452,7 +467,11 @@ public class ConfigManager {
     private Material parseMaterial(FileConfiguration cfg, String path, Material fallback) {
         String str = cfg.getString(path, fallback.name());
         Material mat = Material.matchMaterial(str);
-        return mat != null ? mat : fallback;
+        if (mat == null) {
+            logger.warning("Invalid material '" + str + "' at " + path + ", using " + fallback.name());
+            return fallback;
+        }
+        return mat;
     }
 
     public void reloadTags() {
@@ -529,17 +548,15 @@ public class ConfigManager {
     public String getTagLoreFavorite() { return tagLoreFavorite; }
 
     // Tag/category getters
-    public LinkedHashMap<String, TagDefinition> getTagDefinitions() { return tagDefinitions; }
+    public Map<String, TagDefinition> getTagDefinitions() { return Collections.unmodifiableMap(tagDefinitions); }
     public LinkedHashMap<String, CategoryConfig> getCategories() { return categories; }
 
     public List<String> getCategoryKeys() {
-        return new ArrayList<>(categories.keySet());
+        return Collections.unmodifiableList(categoryKeysList);
     }
 
     public Map<String, String> getCategoryDisplayNames() {
-        Map<String, String> names = new LinkedHashMap<>();
-        categories.forEach((k, v) -> names.put(k, v.displayName()));
-        return names;
+        return Collections.unmodifiableMap(categoryDisplayNamesMap);
     }
 
     public int getCategorySortOrder(String category) {
@@ -565,8 +582,7 @@ public class ConfigManager {
 
     // Voucher getters
     public VoucherConfig getDefaultVoucherConfig() {
-        return new VoucherConfig(defaultVoucherMaterial, defaultVoucherName,
-                defaultVoucherLore, defaultVoucherGlow);
+        return defaultVoucherConfigObj;
     }
 
     // Tag default getters (for /tags create)
