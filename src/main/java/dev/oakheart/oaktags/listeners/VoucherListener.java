@@ -3,7 +3,7 @@ package dev.oakheart.oaktags.listeners;
 import dev.oakheart.oaktags.OakTags;
 import dev.oakheart.oaktags.gui.ConfirmGUI;
 import dev.oakheart.oaktags.managers.TagManager;
-import dev.oakheart.oaktags.message.MessageManager;
+import dev.oakheart.message.MessageManager;
 import dev.oakheart.oaktags.model.TagDefinition;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;

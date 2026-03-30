@@ -1,0 +1,81 @@
+# ============================================================
+# OakTags Messages
+# ============================================================
+# MiniMessage format: https://docs.advntr.dev/minimessage/format.html
+#
+# Placeholders: <player> - Player name, <tag> - Tag display,
+#   <tag_id> - Tag ID, <amount> - Amount, <count> - Claim count
+# Set text to "" to disable individual messages.
+# Display modes: chat, action_bar
+
+# ============================================================
+# GAMEPLAY MESSAGES
+# ============================================================
+tag-equipped:
+  text: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Equipped tag: <tag>"
+  display: chat
+tag-cleared:
+  text: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Active tag cleared."
+  display: chat
+tag-already-owned:
+  text: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#D89B6A>You already have this tag."
+  display: action_bar
+voucher-redeemed:
+  text: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#8FAA87>Redeemed tag: <tag>"
+  display: chat
+tag-favorited:
+  text: "<#8FAA87>Added to favorites."
+  display: action_bar
+tag-unfavorited:
+  text: "<#D89B6A>Removed from favorites."
+  display: action_bar
+voucher-not-found:
+  text: "<#C27B6B>Voucher no longer in hand."
+  display: action_bar
+voucher-invalid:
+  text: "<#C27B6B>This voucher is for a tag that no longer exists."
+  display: action_bar
+
+# ============================================================
+# COMMAND MESSAGES
+# ============================================================
+# Flat strings, always delivered via chat
+commands:
+  reload-success: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#8FAA87>Configuration reloaded."
+  reload-failed: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Reload failed. Check console."
+  tag-given: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Gave <tag> <#f2ebd7>to <#FCD472><player><#f2ebd7>."
+  tag-received: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>You received the <tag> <#f2ebd7>tag!"
+  tag-revoked: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Revoked <tag> <#f2ebd7>from <#FCD472><player><#f2ebd7>."
+  tag-revoked-notify: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#C27B6B>Your <tag> <#C27B6B>tag was revoked."
+  tag-not-found: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Tag not found: <#FCD472><tag_id>"
+  tag-not-granted-type: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>That tag uses permission-based unlock, not grant."
+  player-not-found: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Player not found."
+  player-already-has-tag: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B><player> already has that tag."
+  player-doesnt-have-tag: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B><player> doesn't have that tag."
+  tag-deleted: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Deleted tag <#FCD472><tag_id><#f2ebd7>."
+  tag-id-exists: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Tag ID already exists: <#FCD472><tag_id>"
+  invalid-tag-id: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Invalid tag ID: <#FCD472><tag_id><#C27B6B>. Use only letters, numbers, hyphens, and underscores."
+  invalid-material: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Invalid material: <#FCD472><value>"
+  editor-saved: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#8FAA87>Saved tag <#FCD472><tag_id><#8FAA87> to tags.yml."
+  editor-save-failed: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Failed to write to tags.yml. Check console."
+  editor-cancelled: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Editor cancelled."
+  editor-input-cancelled: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#D89B6A>Input cancelled."
+  voucher-given: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Gave <#FCD472><amount><#f2ebd7>x <tag> <#f2ebd7>voucher to <#FCD472><player><#f2ebd7>."
+  voucher-received: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>You received <#FCD472><amount><#f2ebd7>x <tag> <#f2ebd7>voucher!"
+  list-header: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Tags for <#FCD472><player><#f2ebd7>:"
+  list-entry: "<#6C757D>  - <tag>"
+  list-empty: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#D89B6A>No unlocked tags."
+  no-permission: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>You don't have permission."
+  player-only: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>This command is player-only."
+  help-header: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Available commands:"
+  help-use: "<#6C757D>  /tags <#f2ebd7>- Open tag selector"
+  help-reload: "<#6C757D>  /tags reload <#f2ebd7>- Reload configuration"
+  help-give: "<#6C757D>  /tags give <player> <tag> <#f2ebd7>- Grant a tag"
+  help-revoke: "<#6C757D>  /tags revoke <player> <tag> <#f2ebd7>- Revoke a tag"
+  help-create: "<#6C757D>  /tags create <id> <#f2ebd7>- Create a tag (opens editor)"
+  help-edit: "<#6C757D>  /tags edit <id> <#f2ebd7>- Edit a tag (opens editor)"
+  help-delete: "<#6C757D>  /tags delete <id> <#f2ebd7>- Delete a tag"
+  help-voucher: "<#6C757D>  /tags voucher <tag> [player] [amount] [silent] <#f2ebd7>- Give vouchers"
+  help-list: "<#6C757D>  /tags list [player] <#f2ebd7>- List unlocked tags"
+  help-admin: "<#6C757D>  /tags <player> <#f2ebd7>- Admin tag management"
+  admin-permission-managed: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#D89B6A>This tag is managed by permissions."

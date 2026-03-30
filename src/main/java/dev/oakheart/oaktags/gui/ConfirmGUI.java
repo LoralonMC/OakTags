@@ -4,7 +4,7 @@ import dev.oakheart.oaktags.OakTags;
 import dev.oakheart.oaktags.config.ConfigManager;
 import dev.oakheart.oaktags.config.ConfigManager.GuiItemConfig;
 import dev.oakheart.oaktags.managers.TagManager;
-import dev.oakheart.oaktags.message.MessageManager;
+import dev.oakheart.message.MessageManager;
 import dev.oakheart.oaktags.model.TagDefinition;
 import dev.oakheart.oaktags.model.VoucherConfig;
 import net.kyori.adventure.text.Component;

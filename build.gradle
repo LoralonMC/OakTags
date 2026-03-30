@@ -8,6 +8,7 @@ version = '1.2.0'
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven {
         name = "papermc-repo"
         url = "https://repo.papermc.io/repository/maven-public/"
@@ -16,23 +17,15 @@ repositories {
         name = "placeholderapi"
         url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
     }
-    maven {
-        name = "nexo-repo"
-        url = "https://repo.nexomc.com/releases/"
-    }
-    maven {
-        name = "jitpack"
-        url = "https://jitpack.io"
-    }
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("org.xerial:sqlite-jdbc:3.47.1.0")
-    compileOnly("com.nexomc:nexo:1.20.0")
-    compileOnly("com.github.LoneDev6:api-itemsadder:3.6.3-beta-14")
     implementation("org.bstats:bstats-bukkit:3.1.0")
+    implementation("dev.oakheart:oakheart-core:1.1.0")
+    implementation("dev.oakheart:oakheart-models:1.1.0")
 }
 
 java {
@@ -55,8 +48,13 @@ processResources {
 }
 
 shadowJar {
+    relocate 'org.bstats', 'dev.oakheart.oaktags.bstats'
+    relocate 'dev.oakheart.config', 'dev.oakheart.oaktags.libs.config'
+    relocate 'dev.oakheart.message', 'dev.oakheart.oaktags.libs.message'
+    relocate 'dev.oakheart.command', 'dev.oakheart.oaktags.libs.command'
+    relocate 'dev.oakheart.util', 'dev.oakheart.oaktags.libs.util'
+    relocate 'dev.oakheart.models', 'dev.oakheart.oaktags.libs.models'
     archiveClassifier.set('')
-    relocate("org.bstats", "dev.oakheart.oaktags.bstats")
 }
 
 jar {

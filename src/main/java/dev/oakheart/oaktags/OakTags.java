@@ -13,9 +13,10 @@ import dev.oakheart.oaktags.listeners.ChatInputListener;
 import dev.oakheart.oaktags.listeners.PlayerListener;
 import dev.oakheart.oaktags.listeners.VoucherListener;
 import dev.oakheart.oaktags.managers.TagManager;
-import dev.oakheart.oaktags.message.MessageManager;
 import dev.oakheart.oaktags.placeholder.TagsExpansion;
 import dev.oakheart.oaktags.util.TagsYamlWriter;
+import dev.oakheart.message.MessageManager;
+import dev.oakheart.util.DebugLogger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,6 +29,7 @@ public final class OakTags extends JavaPlugin {
 
     private ConfigManager configManager;
     private MessageManager messageManager;
+    private DebugLogger debugLogger;
     private DataStore dataStore;
     private TagManager tagManager;
     private ChatInputListener chatInputListener;
@@ -65,8 +67,10 @@ public final class OakTags extends JavaPlugin {
         configManager = new ConfigManager(this);
         configManager.load();
 
-        messageManager = new MessageManager(getLogger());
-        messageManager.setConfig(configManager.getConfig());
+        debugLogger = new DebugLogger(getLogger(), configManager::isDebugMode);
+
+        messageManager = new MessageManager(this, getLogger());
+        messageManager.load();
 
         dataStore = new SQLiteDataStore(getLogger(), getDataFolder());
         dataStore.initialize();
@@ -135,15 +139,15 @@ public final class OakTags extends JavaPlugin {
             throw new RuntimeException("Config reload failed validation");
         }
 
-        messageManager.setConfig(configManager.getConfig());
+        messageManager.reload();
         tagManager.reload();
 
         getLogger().info("OakTags configuration reloaded.");
     }
 
     public void debug(String message) {
-        if (configManager != null && configManager.isDebugMode()) {
-            getLogger().info("[DEBUG] " + message);
+        if (debugLogger != null) {
+            debugLogger.log(message);
         }
     }
 

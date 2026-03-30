@@ -3,9 +3,10 @@ package dev.oakheart.oaktags.gui;
 import dev.oakheart.oaktags.OakTags;
 import dev.oakheart.oaktags.config.ConfigManager;
 import dev.oakheart.oaktags.config.ConfigManager.GuiItemConfig;
-import dev.oakheart.oaktags.integration.ModelProviderManager;
+import dev.oakheart.models.ModelProviderManager;
 import dev.oakheart.oaktags.managers.TagManager;
-import dev.oakheart.oaktags.message.MessageManager;
+import dev.oakheart.oaktags.util.LoreHelper;
+import dev.oakheart.message.MessageManager;
 import dev.oakheart.oaktags.model.PlayerTagData;
 import dev.oakheart.oaktags.model.TagDefinition;
 import dev.oakheart.oaktags.model.UnlockType;
@@ -148,7 +149,7 @@ public class AdminGUI implements InventoryHolder {
 
         // Apply custom icon model for unlocked tags
         if (unlocked && tag.getModelId() != null && !tag.getModelId().isEmpty()) {
-            new ModelProviderManager(plugin.getLogger()).applyModelById(item, tag.getModelId());
+            new ModelProviderManager(plugin.getLogger()).applyModel(item, tag.getModelId());
         }
 
         ItemMeta meta = item.getItemMeta();
@@ -185,7 +186,7 @@ public class AdminGUI implements InventoryHolder {
                 Placeholder.unparsed("count", String.valueOf(tagManager.getClaimCount(tag.getId())))
         );
 
-        List<Component> lore = messages.resolveLoreLayout(
+        List<Component> lore = LoreHelper.resolveLoreLayout(messages,
                 config.getAdminTagLoreLayout(), tag.getLore(), resolvers);
         if (!lore.isEmpty()) meta.lore(lore);
 

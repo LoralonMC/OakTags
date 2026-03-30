@@ -5,13 +5,9 @@ import dev.oakheart.oaktags.model.TagDefinition;
 import dev.oakheart.oaktags.model.UnlockType;
 import dev.oakheart.oaktags.model.VoucherConfig;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,8 +17,8 @@ public class ConfigManager {
     private final Logger logger;
     private final File configFile;
     private final File tagsFile;
-    private FileConfiguration config;
-    private FileConfiguration tagsConfig;
+    private dev.oakheart.config.ConfigManager config;
+    private dev.oakheart.config.ConfigManager tagsConfig;
 
     // General
     private boolean debugMode;
@@ -148,93 +144,61 @@ public class ConfigManager {
         if (!tagsFile.exists()) {
             plugin.saveResource("tags.yml", false);
         }
-        this.config = YamlConfiguration.loadConfiguration(configFile);
-        mergeDefaults(this.config);
-        validate(this.config);
+
+        try {
+            config = dev.oakheart.config.ConfigManager.load(configFile.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load config.yml", e);
+        }
+
+        mergeDefaults();
+        validate(config);
         cacheValues();
         loadTags();
     }
 
     public boolean reload() {
-        FileConfiguration newConfig = YamlConfiguration.loadConfiguration(configFile);
-        mergeDefaults(newConfig);
-        if (!validate(newConfig)) {
+        try {
+            config.reload();
+        } catch (IOException e) {
+            logger.warning("Failed to reload config.yml: " + e.getMessage());
+            return false;
+        }
+
+        if (!validate(config)) {
             logger.warning("Configuration reload failed validation. Keeping previous configuration.");
             return false;
         }
-        this.config = newConfig;
+
         cacheValues();
         loadTags();
         logger.info("Configuration reloaded successfully.");
         return true;
     }
 
-    private void mergeDefaults(FileConfiguration target) {
-        try (InputStreamReader reader = new InputStreamReader(
-                plugin.getResource("config.yml"), StandardCharsets.UTF_8)) {
-            FileConfiguration defaults = YamlConfiguration.loadConfiguration(reader);
-            target.setDefaults(defaults);
-            if (hasNewKeys(target, defaults)) {
-                target.options().copyDefaults(true);
-                target.save(configFile);
-                logger.info("Merged missing config keys from defaults.");
+    private void mergeDefaults() {
+        try (var stream = plugin.getResource("config.yml")) {
+            if (stream != null) {
+                var defaults = dev.oakheart.config.ConfigManager.fromStream(stream);
+                if (config.mergeDefaults(defaults)) {
+                    config.save();
+                    logger.info("Merged missing config keys from defaults.");
+                }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.log(Level.WARNING, "Failed to merge default config", e);
         }
     }
 
-    private boolean hasNewKeys(FileConfiguration target, FileConfiguration defaults) {
-        for (String key : defaults.getKeys(true)) {
-            if (defaults.isConfigurationSection(key)) continue;
-            if (!target.contains(key, true)) {
-                // Check if this key is missing because the user replaced entries in
-                // a map-like section (e.g., categories). If the parent section exists
-                // in the user's config with different children, that's intentional —
-                // not a genuinely new key from a plugin update.
-                if (isMissingDueToUserCustomization(key, target)) continue;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isMissingDueToUserCustomization(String key, FileConfiguration target) {
-        // Walk up the key path to find the first missing ancestor.
-        // If that ancestor's parent exists as a section in the user's config,
-        // the user replaced entries at that level — skip this key.
-        int lastDot = key.lastIndexOf('.');
-        while (lastDot > 0) {
-            String parent = key.substring(0, lastDot);
-            if (target.contains(parent, true)) {
-                // Parent exists — the key itself is genuinely missing (new feature key)
-                return false;
-            }
-            int grandparentDot = parent.lastIndexOf('.');
-            if (grandparentDot > 0) {
-                String grandparent = parent.substring(0, grandparentDot);
-                if (target.isConfigurationSection(grandparent)) {
-                    // Grandparent exists as a section — user replaced children at this level
-                    return true;
-                }
-            } else {
-                // Parent is a top-level key that doesn't exist — genuinely new
-                return false;
-            }
-            lastDot = grandparentDot;
-        }
-        return false;
-    }
-
-    private boolean validate(FileConfiguration configToValidate) {
+    private boolean validate(dev.oakheart.config.ConfigManager configToValidate) {
         List<String> warnings = new ArrayList<>();
 
         if (configToValidate.getInt("batch-write-interval", 300) < 10) {
             warnings.add("batch-write-interval is very low (< 10s), may cause performance issues");
         }
 
-        ConfigurationSection catSection = configToValidate.getConfigurationSection("categories");
-        if (catSection == null || catSection.getKeys(false).isEmpty()) {
+        if (!configToValidate.isSection("categories") ||
+                configToValidate.getKeys("categories", false).isEmpty()) {
             warnings.add("No categories defined. Tags will have no category grouping.");
         }
 
@@ -259,7 +223,7 @@ public class ConfigManager {
         lockedSound = config.getString("gui.locked-sound", "minecraft:block.note_block.bass");
         clickSound = config.getString("gui.click-sound", "minecraft:ui.button.click");
 
-        // Nav bar slots (read from each item section)
+        // Nav bar slots
         navPrevSlot = config.getInt("gui.items.previous-page.slot", 0);
         navSortSlot = config.getInt("gui.items.sort.slot", 1);
         navReverseSlot = config.getInt("gui.items.reverse.slot", 2);
@@ -287,7 +251,7 @@ public class ConfigManager {
 
         // GUI items
         fillerItem = parseGuiItem("gui.items.filler", Material.GRAY_STAINED_GLASS_PANE, "", List.of());
-        lockedTagMaterial = parseMaterial(config, "gui.items.locked-tag.material", Material.RED_STAINED_GLASS_PANE);
+        lockedTagMaterial = parseMaterial("gui.items.locked-tag.material", Material.RED_STAINED_GLASS_PANE);
         prevPageItem = parseGuiItem("gui.items.previous-page", Material.ARROW, "<#f2ebd7>Previous Page", List.of());
         nextPageItem = parseGuiItem("gui.items.next-page", Material.ARROW, "<#f2ebd7>Next Page", List.of());
         sortItem = parseGuiItem("gui.items.sort", Material.HOPPER, "<#f2ebd7>Sort: <#FCD472><mode>", List.of());
@@ -296,18 +260,18 @@ public class ConfigManager {
                 "<#6C757D>Page <#FCD472><current><#6C757D>/<#FCD472><total>", List.of());
 
         // Reverse button
-        reverseAscMaterial = parseMaterial(config, "gui.items.reverse.ascending-material", Material.ARROW);
-        reverseDescMaterial = parseMaterial(config, "gui.items.reverse.descending-material", Material.SPECTRAL_ARROW);
+        reverseAscMaterial = parseMaterial("gui.items.reverse.ascending-material", Material.ARROW);
+        reverseDescMaterial = parseMaterial("gui.items.reverse.descending-material", Material.SPECTRAL_ARROW);
         reverseName = config.getString("gui.items.reverse.name", "<#f2ebd7>Order: <#FCD472><direction>");
         reverseAscLabel = config.getString("gui.items.reverse.ascending-label", "Ascending");
         reverseDescLabel = config.getString("gui.items.reverse.descending-label", "Descending");
         reverseLore = config.getStringList("gui.items.reverse.lore");
 
         // Filter button
-        filterAllMaterial = parseMaterial(config, "gui.items.filter.all-material", Material.COMPASS);
-        filterFavoritesMaterial = parseMaterial(config, "gui.items.filter.favorites-material", Material.GLOW_INK_SAC);
-        filterUnlockedMaterial = parseMaterial(config, "gui.items.filter.unlocked-material", Material.LIME_DYE);
-        filterLockedMaterial = parseMaterial(config, "gui.items.filter.locked-material", Material.GRAY_DYE);
+        filterAllMaterial = parseMaterial("gui.items.filter.all-material", Material.COMPASS);
+        filterFavoritesMaterial = parseMaterial("gui.items.filter.favorites-material", Material.GLOW_INK_SAC);
+        filterUnlockedMaterial = parseMaterial("gui.items.filter.unlocked-material", Material.LIME_DYE);
+        filterLockedMaterial = parseMaterial("gui.items.filter.locked-material", Material.GRAY_DYE);
         filterName = config.getString("gui.items.filter.name", "<#f2ebd7>Filter: <#FCD472><mode>");
         filterLore = config.getStringList("gui.items.filter.lore");
 
@@ -326,14 +290,14 @@ public class ConfigManager {
         tagLoreFavorite = config.getString("gui.tag-lore.favorite", "<#FCD472>★ Favorite");
 
         // Voucher defaults
-        defaultVoucherMaterial = parseMaterial(config, "voucher.material", Material.NAME_TAG);
+        defaultVoucherMaterial = parseMaterial("voucher.material", Material.NAME_TAG);
         defaultVoucherName = config.getString("voucher.name", "<tag> <#f2ebd7>Chat Tag");
         defaultVoucherLore = config.getStringList("voucher.lore");
         defaultVoucherGlow = config.getBoolean("voucher.glow", true);
 
         // Tag defaults (for /tags create)
         defaultTagDisplay = config.getString("tag-defaults.display", "<#FCD472>[<id>]");
-        defaultTagMaterial = parseMaterial(config, "tag-defaults.material", Material.NAME_TAG);
+        defaultTagMaterial = parseMaterial("tag-defaults.material", Material.NAME_TAG);
         defaultTagCategory = config.getString("tag-defaults.category", "general");
         defaultTagLore = config.getStringList("tag-defaults.lore");
 
@@ -373,13 +337,15 @@ public class ConfigManager {
 
         // Categories
         categories = new LinkedHashMap<>();
-        ConfigurationSection catSection = config.getConfigurationSection("categories");
-        if (catSection != null) {
+        if (config.isSection("categories")) {
+            dev.oakheart.config.ConfigManager catSection = config.getSection("categories");
             List<Map.Entry<String, CategoryConfig>> catList = new ArrayList<>();
             for (String key : catSection.getKeys(false)) {
-                String displayName = catSection.getString(key + ".display-name", key);
-                int sortOrder = catSection.getInt(key + ".sort-order", 99);
-                String matStr = catSection.getString(key + ".material", "NAME_TAG");
+                dev.oakheart.config.ConfigManager catEntry = catSection.getSection(key);
+                if (catEntry == null) continue;
+                String displayName = catEntry.getString("display-name", key);
+                int sortOrder = catEntry.getInt("sort-order", 99);
+                String matStr = catEntry.getString("material", "NAME_TAG");
                 Material mat = Material.matchMaterial(matStr);
                 if (mat == null) mat = Material.NAME_TAG;
                 catList.add(Map.entry(key, new CategoryConfig(displayName, sortOrder, mat)));
@@ -399,21 +365,26 @@ public class ConfigManager {
 
     private GuiItemConfig parseGuiItem(String path, Material defaultMaterial,
                                         String defaultName, List<String> defaultLore) {
-        Material material = parseMaterial(config, path + ".material", defaultMaterial);
+        Material material = parseMaterial(path + ".material", defaultMaterial);
         String name = config.getString(path + ".name", defaultName);
-        List<String> lore = config.contains(path + ".lore", true)
+        List<String> lore = config.contains(path + ".lore")
                 ? config.getStringList(path + ".lore") : defaultLore;
         return new GuiItemConfig(material, name, lore);
     }
 
     private void loadTags() {
-        this.tagsConfig = YamlConfiguration.loadConfiguration(tagsFile);
+        try {
+            tagsConfig = dev.oakheart.config.ConfigManager.load(tagsFile.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load tags.yml", e);
+        }
+
         tagDefinitions = new LinkedHashMap<>();
         List<String> warnings = new ArrayList<>();
         int order = 0;
 
         for (String id : tagsConfig.getKeys(false)) {
-            ConfigurationSection section = tagsConfig.getConfigurationSection(id);
+            dev.oakheart.config.ConfigManager section = tagsConfig.getSection(id);
             if (section == null) continue;
 
             String display = section.getString("display");
@@ -436,8 +407,8 @@ public class ConfigManager {
 
             // Per-tag voucher config
             VoucherConfig voucherConfig = null;
-            ConfigurationSection vSection = section.getConfigurationSection("voucher");
-            if (vSection != null) {
+            if (section.isSection("voucher")) {
+                dev.oakheart.config.ConfigManager vSection = section.getSection("voucher");
                 String vMat = vSection.getString("material", defaultVoucherMaterial.name());
                 Material vMaterial = Material.matchMaterial(vMat);
                 if (vMaterial == null) vMaterial = defaultVoucherMaterial;
@@ -464,8 +435,8 @@ public class ConfigManager {
         logger.info("Loaded " + tagDefinitions.size() + " tags from tags.yml.");
     }
 
-    private Material parseMaterial(FileConfiguration cfg, String path, Material fallback) {
-        String str = cfg.getString(path, fallback.name());
+    private Material parseMaterial(String path, Material fallback) {
+        String str = config.getString(path, fallback.name());
         Material mat = Material.matchMaterial(str);
         if (mat == null) {
             logger.warning("Invalid material '" + str + "' at " + path + ", using " + fallback.name());
@@ -483,7 +454,6 @@ public class ConfigManager {
     }
 
     // General getters
-    public FileConfiguration getConfig() { return config; }
     public boolean isDebugMode() { return debugMode; }
     public int getBatchWriteInterval() { return batchWriteInterval; }
 

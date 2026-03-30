@@ -2,7 +2,7 @@ name: OakTags
 version: '${version}'
 main: dev.oakheart.oaktags.OakTags
 description: 'Unified chat tag system with GUI, vouchers, and PlaceholderAPI integration.'
-api-version: '1.21.8'
+api-version: '1.21.10'
 authors:
   - Loralon
 website: https://github.com/LoralonMC/OakTags

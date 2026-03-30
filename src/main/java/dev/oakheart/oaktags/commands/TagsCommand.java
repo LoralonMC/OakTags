@@ -7,12 +7,13 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.oakheart.oaktags.OakTags;
 import dev.oakheart.oaktags.config.ConfigManager;
+import dev.oakheart.command.CommandRegistrar;
 import dev.oakheart.oaktags.gui.AdminGUI;
 import dev.oakheart.oaktags.gui.TagEditorGUI;
 import dev.oakheart.oaktags.gui.TagsGUI;
 import dev.oakheart.oaktags.listeners.ChatInputListener;
 import dev.oakheart.oaktags.managers.TagManager;
-import dev.oakheart.oaktags.message.MessageManager;
+import dev.oakheart.message.MessageManager;
 import dev.oakheart.oaktags.model.PlayerTagData;
 import dev.oakheart.oaktags.model.TagDefinition;
 import dev.oakheart.oaktags.model.UnlockType;
@@ -20,8 +21,6 @@ import dev.oakheart.oaktags.model.VoucherConfig;
 import dev.oakheart.oaktags.util.TagsYamlWriter;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -32,8 +31,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -98,13 +95,9 @@ public class TagsCommand {
     }
 
     public void register() {
-        LifecycleEventManager<Plugin> manager = plugin.getLifecycleManager();
-        manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-            Commands commands = event.registrar();
-            commands.register(buildCommand(), "Chat tag system", List.of("tag"));
-            commands.register(buildRedeemBridgeCommand(),
-                    "Bridge command for ExecutableItems/DeluxeMenu tag redemption");
-        });
+        CommandRegistrar.register(plugin, buildCommand(), "Chat tag system", List.of("tag"));
+        CommandRegistrar.register(plugin, buildRedeemBridgeCommand(),
+                "Bridge command for ExecutableItems/DeluxeMenu tag redemption");
     }
 
     private LiteralCommandNode<CommandSourceStack> buildCommand() {
