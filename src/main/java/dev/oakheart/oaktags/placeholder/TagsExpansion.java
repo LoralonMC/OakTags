@@ -52,9 +52,9 @@ public class TagsExpansion extends PlaceholderExpansion {
                 if (visible.isBlank()) yield "";
                 yield visible.endsWith(" ") ? result : result + " ";
             }
-            case "tag" -> tagManager.getActiveTagDisplay(player.getUniqueId());
+            case "tag" -> tagManager.getActiveTagDisplay(player);
             case "tag_name" -> {
-                String id = tagManager.getActiveTagId(player.getUniqueId());
+                String id = tagManager.getActiveTagId(player);
                 yield id != null ? id : "";
             }
             case "unlocked" -> String.valueOf(tagManager.getUnlockedCount(player));
@@ -77,7 +77,7 @@ public class TagsExpansion extends PlaceholderExpansion {
     }
 
     private String resolvePrefix(Player player) {
-        String activeDisplay = tagManager.getActiveTagDisplay(player.getUniqueId());
+        String activeDisplay = tagManager.getActiveTagDisplay(player);
         String fallback = configManager.getPrefixFallback();
         String expandedFallback = PlaceholderAPI.setPlaceholders(player, fallback);
 

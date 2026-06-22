@@ -24,6 +24,13 @@ public class PlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             tagManager.loadPlayer(event.getPlayer().getUniqueId());
+            // Auto-unequip an equipped tag the player no longer has access to (permission
+            // checks need the main thread, and only matter while the player is online).
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (event.getPlayer().isOnline()) {
+                    tagManager.validateActiveTag(event.getPlayer());
+                }
+            });
         });
     }
 

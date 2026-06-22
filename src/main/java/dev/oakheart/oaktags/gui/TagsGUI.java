@@ -170,7 +170,7 @@ public class TagsGUI implements InventoryHolder {
 
     private ItemStack createTagItem(TagDefinition tag) {
         boolean unlocked = tagManager.hasTag(player, tag.getId());
-        String activeTagId = tagManager.getActiveTagId(player.getUniqueId());
+        String activeTagId = tagManager.getActiveTagId(player);
         boolean active = tag.getId().equals(activeTagId);
 
         Material material = unlocked ? tag.getMaterial() : config.getLockedTagMaterial();

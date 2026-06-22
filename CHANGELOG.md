@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `silent` option for `/tags voucher` command — suppresses the notification to the receiving player
 
+### Changed
+
+- Updated comments in the default `config.yml` are now synced onto existing config files on plugin updates, without clobbering admin-customized comments (OakheartLib 1.3.0 comment-sync).
+
+### Fixed
+
+- Equipped permission-based tags are now auto-unequipped when a player loses access (e.g. a backing group/permission is removed). Previously the tag kept displaying in chat. Re-validated on join, on chat/placeholder display, and when opening the tags GUI.
+
 ## [1.1.0] - 2026-03-04
 
 ### Changed

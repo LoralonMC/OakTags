@@ -190,11 +190,60 @@ public class TagManager {
         return data != null ? data.getActiveTagId() : null;
     }
 
+    /**
+     * Returns the player's active tag id, first auto-unequipping it if the player has
+     * lost access (e.g. a permission/group backing a PERMISSION tag was removed).
+     */
+    public String getActiveTagId(Player player) {
+        return validateActiveTag(player) ? getActiveTagId(player.getUniqueId()) : null;
+    }
+
     public String getActiveTagDisplay(UUID uuid) {
         PlayerTagData data = playerCache.get(uuid);
         if (data == null || data.getActiveTagId() == null) return "";
         TagDefinition tag = tagRegistry.get(data.getActiveTagId());
         return tag != null ? tag.getDisplay() : "";
+    }
+
+    /**
+     * Returns the player's active tag display, first auto-unequipping it if the player has
+     * lost access (e.g. a permission/group backing a PERMISSION tag was removed).
+     */
+    public String getActiveTagDisplay(Player player) {
+        if (!validateActiveTag(player)) return "";
+        return getActiveTagDisplay(player.getUniqueId());
+    }
+
+    /**
+     * Verifies the player still has access to their equipped tag. If access was lost
+     * (permission/group removed, or the tag was deleted) the tag is auto-unequipped:
+     * cleared from the cache, persisted on the next batch save, and a TagChangeEvent fired.
+     *
+     * @return true if the player has a valid, still-accessible active tag; false otherwise
+     */
+    public boolean validateActiveTag(Player player) {
+        UUID uuid = player.getUniqueId();
+        PlayerTagData data = playerCache.get(uuid);
+        if (data == null) return false;
+        String activeId = data.getActiveTagId();
+        if (activeId == null) return false;
+        if (hasTag(player, activeId)) return true;
+
+        // Lost access -> auto-unequip
+        data.setActiveTagId(null);
+        dirtySettings.add(uuid);
+        fireUnequip(uuid);
+        return false;
+    }
+
+    private void fireUnequip(UUID uuid) {
+        TagChangeEvent event = new TagChangeEvent(uuid, TagChangeEvent.Action.UNEQUIP, null);
+        if (Bukkit.isPrimaryThread()) {
+            Bukkit.getPluginManager().callEvent(event);
+        } else {
+            // Placeholder resolution can run off the main thread; events must fire on it.
+            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(event));
+        }
     }
 
     public PlayerTagData getPlayerData(UUID uuid) {
