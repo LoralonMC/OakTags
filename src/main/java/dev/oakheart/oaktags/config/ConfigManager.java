@@ -151,7 +151,7 @@ public class ConfigManager {
             throw new RuntimeException("Failed to load config.yml", e);
         }
 
-        mergeDefaults();
+        evolveConfig();
         validate(config);
         cacheValues();
         loadTags();
@@ -176,17 +176,22 @@ public class ConfigManager {
         return true;
     }
 
-    private void mergeDefaults() {
+    private void evolveConfig() {
         try (var stream = plugin.getResource("config.yml")) {
-            if (stream != null) {
-                var defaults = dev.oakheart.config.ConfigManager.fromStream(stream);
-                if (config.mergeDefaults(defaults)) {
-                    config.save();
-                    logger.info("Merged missing config keys from defaults.");
-                }
+            if (stream == null) return;
+            var defaults = dev.oakheart.config.ConfigManager.fromStream(stream);
+            // Additive: insert missing keys at the right position with their comments.
+            boolean merged = config.mergeDefaults(defaults);
+            // Documentation: 3-way sync of changed comments onto existing keys, never
+            // clobbering admin-customized comments (seeds baseline on first run).
+            boolean synced = config.syncComments(defaults,
+                    configFile.getParentFile().toPath().resolve(".oakheart/config-baseline.yml"));
+            if (merged || synced) {
+                config.save();
+                logger.info("Config evolved (merged defaults / synced comments).");
             }
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to merge default config", e);
+            logger.log(Level.WARNING, "Failed to evolve config", e);
         }
     }
 
