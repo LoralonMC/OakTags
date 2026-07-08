@@ -28,7 +28,10 @@ public class VoucherListener implements Listener {
         this.voucherKey = new NamespacedKey(plugin, OakTags.VOUCHER_KEY_ID);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    // Not ignoreCancelled: right-clicking air leaves the interacted-block result as DENY,
+    // which makes the event report cancelled by default, so ignoreCancelled would skip
+    // RIGHT_CLICK_AIR entirely and vouchers could only be redeemed against a block.
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!event.getAction().isRightClick()) return;
         if (event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
@@ -44,7 +47,9 @@ public class VoucherListener implements Listener {
         handleVoucherUse(player, tagId);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    // Not ignoreCancelled: we must always cancel here so a voucher name tag can never
+    // rename a mob, and redemption stays available even if another plugin cancelled first.
+    @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItem(event.getHand());

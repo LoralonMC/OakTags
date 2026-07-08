@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Tag vouchers can now be redeemed by right-clicking in the air, not just against a block. Previously air right-clicks were silently ignored.
+- Tag vouchers (name tags) can no longer rename mobs, animals, or other entities when right-clicked on them — the interaction is cancelled and the voucher is redeemed instead.
 - Equipped permission-based tags are now auto-unequipped when a player loses access (e.g. a backing group/permission is removed). Previously the tag kept displaying in chat. Re-validated on join, on chat/placeholder display, and when opening the tags GUI.
 
 ## [1.1.0] - 2026-03-04
