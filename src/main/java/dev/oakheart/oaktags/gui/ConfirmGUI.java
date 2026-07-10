@@ -140,10 +140,19 @@ public class ConfirmGUI implements InventoryHolder {
             return;
         }
 
-        // Find and consume the voucher — verify it's still in the player's hand
+        // Verify the voucher is still in the player's hand before granting
         ItemStack voucher = findVoucherInHands();
         if (voucher == null) {
             messages.send(player, "voucher-not-found");
+            player.closeInventory();
+            return;
+        }
+
+        // Grant before consuming: grantTag refuses permission-unlock tags and
+        // players whose data hasn't loaded yet, and the voucher must survive a
+        // refusal instead of being eaten with nothing given.
+        if (!tagManager.grantTag(player.getUniqueId(), tagId, "voucher")) {
+            messages.send(player, "voucher-invalid");
             player.closeInventory();
             return;
         }
@@ -158,8 +167,6 @@ public class ConfirmGUI implements InventoryHolder {
                 player.getInventory().setItemInOffHand(null);
             }
         }
-
-        tagManager.grantTag(player.getUniqueId(), tagId, "voucher");
 
         messages.send(player, "voucher-redeemed",
                 Placeholder.parsed("tag", tag.getDisplay()));

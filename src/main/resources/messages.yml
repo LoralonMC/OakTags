@@ -47,6 +47,8 @@ commands:
   tag-received: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>You received the <tag> <#f2ebd7>tag!"
   tag-revoked: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#f2ebd7>Revoked <tag> <#f2ebd7>from <#FCD472><player><#f2ebd7>."
   tag-revoked-notify: "<#6C757D>[<#6B7A5E>ᴛᴀɢꜱ<#6C757D>] <#C27B6B>Your <tag> <#C27B6B>tag was revoked."
+  tag-give-failed: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Couldn't give the tag to <player>. Try again in a moment."
+  tag-revoke-failed: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Couldn't revoke the tag from <player>. Try again in a moment."
   tag-not-found: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Tag not found: <#FCD472><tag_id>"
   tag-not-granted-type: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>That tag uses permission-based unlock, not grant."
   player-not-found: "<#6C757D>[<#C27B6B>ᴇʀʀᴏʀ<#6C757D>] <#C27B6B>Player not found."

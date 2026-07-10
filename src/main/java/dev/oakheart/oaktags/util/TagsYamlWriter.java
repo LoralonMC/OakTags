@@ -153,7 +153,11 @@ public class TagsYamlWriter {
         lines.add("  unlock-type: " + tag.getUnlockType().name().toLowerCase());
 
         if (tag.getUnlockType() == UnlockType.PERMISSION) {
-            lines.add("  unlock-permission: " + tag.getUnlockPermission());
+            // Quoted like display/lore: the permission comes from free-form chat
+            // input in the editor, and an unquoted value containing ": " or a
+            // leading [/{/'/# writes structurally invalid YAML — which fails
+            // loadTags() and disables the whole plugin on the next restart.
+            lines.add("  unlock-permission: '" + escapeYamlSingleQuote(tag.getUnlockPermission()) + "'");
         }
 
         if (tag.getMaterial() != Material.NAME_TAG) {

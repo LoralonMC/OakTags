@@ -227,32 +227,44 @@ public class AdminGUI implements InventoryHolder {
             return;
         }
 
+        // Success messages are conditioned on the manager's result: grants and
+        // revokes fail when the target's cache entry is gone (e.g. evicted while
+        // this GUI was open), and telling the admin "Gave tag" when nothing
+        // happened turns a recoverable hiccup into a support mystery.
         boolean unlocked = isTagUnlocked(tag);
         if (unlocked) {
             // Revoke
-            tagManager.revokeTag(targetUuid, tag.getId());
-            messages.sendCommand(admin, "tag-revoked",
-                    Placeholder.parsed("tag", tag.getDisplay()),
-                    Placeholder.unparsed("player", targetName));
+            if (tagManager.revokeTag(targetUuid, tag.getId())) {
+                messages.sendCommand(admin, "tag-revoked",
+                        Placeholder.parsed("tag", tag.getDisplay()),
+                        Placeholder.unparsed("player", targetName));
 
-            // Notify target if online
-            Player target = Bukkit.getPlayer(targetUuid);
-            if (target != null) {
-                messages.sendCommand(target, "tag-revoked-notify",
-                        Placeholder.parsed("tag", tag.getDisplay()));
+                // Notify target if online
+                Player target = Bukkit.getPlayer(targetUuid);
+                if (target != null) {
+                    messages.sendCommand(target, "tag-revoked-notify",
+                            Placeholder.parsed("tag", tag.getDisplay()));
+                }
+            } else {
+                messages.sendCommand(admin, "tag-revoke-failed",
+                        Placeholder.unparsed("player", targetName));
             }
         } else {
             // Grant
-            tagManager.grantTag(targetUuid, tag.getId(), admin.getName());
-            messages.sendCommand(admin, "tag-given",
-                    Placeholder.parsed("tag", tag.getDisplay()),
-                    Placeholder.unparsed("player", targetName));
+            if (tagManager.grantTag(targetUuid, tag.getId(), admin.getName())) {
+                messages.sendCommand(admin, "tag-given",
+                        Placeholder.parsed("tag", tag.getDisplay()),
+                        Placeholder.unparsed("player", targetName));
 
-            // Notify target if online
-            Player target = Bukkit.getPlayer(targetUuid);
-            if (target != null) {
-                messages.sendCommand(target, "tag-received",
-                        Placeholder.parsed("tag", tag.getDisplay()));
+                // Notify target if online
+                Player target = Bukkit.getPlayer(targetUuid);
+                if (target != null) {
+                    messages.sendCommand(target, "tag-received",
+                            Placeholder.parsed("tag", tag.getDisplay()));
+                }
+            } else {
+                messages.sendCommand(admin, "tag-give-failed",
+                        Placeholder.unparsed("player", targetName));
             }
         }
 

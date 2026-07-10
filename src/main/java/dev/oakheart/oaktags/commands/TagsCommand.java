@@ -367,7 +367,11 @@ public class TagsCommand {
             return;
         }
 
-        tagManager.grantTag(targetUuid, tag.getId(), sender.getName());
+        if (!tagManager.grantTag(targetUuid, tag.getId(), sender.getName())) {
+            messages.sendCommand(sender, "tag-give-failed",
+                    Placeholder.unparsed("player", targetName));
+            return;
+        }
 
         messages.sendCommand(sender, "tag-given",
                 Placeholder.parsed("tag", tag.getDisplay()),
@@ -437,7 +441,11 @@ public class TagsCommand {
             return;
         }
 
-        tagManager.revokeTag(targetUuid, tag.getId());
+        if (!tagManager.revokeTag(targetUuid, tag.getId())) {
+            messages.sendCommand(sender, "tag-revoke-failed",
+                    Placeholder.unparsed("player", targetName));
+            return;
+        }
 
         messages.sendCommand(sender, "tag-revoked",
                 Placeholder.parsed("tag", tag.getDisplay()),
@@ -504,6 +512,14 @@ public class TagsCommand {
         if (tag == null) {
             messages.sendCommand(sender, "tag-not-found",
                     Placeholder.unparsed("tag_id", tagId));
+            return;
+        }
+
+        // Vouchers only make sense for GRANTED tags: redeeming runs grantTag,
+        // which refuses permission-unlock tags, so a voucher for one could never
+        // be redeemed. Refuse creation instead of minting a dead item.
+        if (tag.getUnlockType() != UnlockType.GRANTED) {
+            messages.sendCommand(sender, "tag-not-granted-type");
             return;
         }
 
