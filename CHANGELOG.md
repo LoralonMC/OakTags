@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-20
+
 ### Added
 
 - `silent` option for `/tags voucher` command — suppresses the notification to the receiving player
 
 ### Changed
 
+- Targets Paper 26.3 (`api-version: '26.3'`, built against paper-api 26.3). This build no longer loads on 26.1.2.
 - Updated comments in the default `config.yml` are now synced onto existing config files on plugin updates, without clobbering admin-customized comments (OakheartLib 1.3.0 comment-sync).
 
 ### Fixed
