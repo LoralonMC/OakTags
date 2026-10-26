@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-10-26
+
+### Fixed
+
+- Tag vouchers can be placed in item frames again. Right-clicking any entity with a voucher was cancelled (to stop the name tag renaming mobs), and an item frame is an entity. Right-clicking a frame now does the vanilla thing.
+
 ## [1.3.0] - 2026-10-20
 
 ### Added

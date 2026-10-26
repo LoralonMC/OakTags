@@ -6,6 +6,7 @@ import dev.oakheart.oaktags.managers.TagManager;
 import dev.oakheart.message.MessageManager;
 import dev.oakheart.oaktags.model.TagDefinition;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -57,6 +58,10 @@ public class VoucherListener implements Listener {
 
         String tagId = getVoucherTagId(item);
         if (tagId == null) return;
+
+        // Item frames (glow ones too) are entities: cancelling here would stop vouchers
+        // being framed. Name tags can't rename a frame, so there is nothing to guard.
+        if (event.getRightClicked() instanceof ItemFrame) return;
 
         // Prevent naming mobs with voucher name tags
         event.setCancelled(true);
